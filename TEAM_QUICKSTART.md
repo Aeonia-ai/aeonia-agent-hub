@@ -15,7 +15,7 @@ A working prototype of a **multi-agent coordination hub**. It lets multiple AI a
 git clone git@github.com:Aeonia-ai/claude-symphony-of-one-mcp.git
 cd claude-symphony-of-one-mcp
 npm install
-npm test          # optional: 29 tests should pass
+npm test          # optional: 39 tests should pass
 ```
 
 ## 3. Run the hub
@@ -76,7 +76,7 @@ To use a custom roster, point `ROLES_CONFIG` at your JSON file when starting the
 ROLES_CONFIG=/path/to/my-roster.json PORT=3000 ... node server.js
 ```
 
-The JSON file should contain `{ "roles": { ... }, "taskTemplates": { ... }, "quickAssignments": { ... } }`. Any key you omit falls back to the generic default. See `role-templates.js` and the README for the full schema.
+The JSON file should contain `{ "roles": { ... }, "taskTemplates": { ... }, "quickAssignments": { ... } }`. Any key you omit falls back to the generic default. Full field reference: [docs/configuration.md](docs/configuration.md#roles-configuration).
 
 Set `AGENT_NAME` to whichever role key you are taking on (e.g. `AGENT_NAME=SENIOR_DEVELOPER`).
 

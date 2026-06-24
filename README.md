@@ -4,6 +4,8 @@
 >
 > **Custom roles:** set `ROLES_CONFIG=/abs/path/to/your-roster.json` to load your own agent roster at startup; generic Symphony defaults are used otherwise. See [Configuring Roles](#configuring-roles) below.
 >
+> **Docs:** [Configuration](docs/configuration.md) · [Transports](docs/transports.md) · [Changelog](CHANGELOG.md)
+>
 > _Upstream README below._
 
 ---
