@@ -1,5 +1,5 @@
-> # 🎶 Aeonia Agent Hub — Aeonia's fork
-> Hardened build of Symphony-of-One MCP for the Aeonia agent org (bug fixes, tests, token auth, swappable transport, KOS roles).
+> # 🎶 Symphony of One — Aeonia's maintained fork
+> A hardened fork of the Symphony-of-One MCP: bug fixes (room leave, task persistence, cross-room message leak, dead events, missing CLI routes), automated tests, shared-token auth, and a swappable transport adapter (SocketIO now, Matrix stub for v2). KOS agent roles baked in.
 > **New here? → [`TEAM_QUICKSTART.md`](TEAM_QUICKSTART.md)** · Build plan + status → [`AEONIA_V1_PLAN.md`](AEONIA_V1_PLAN.md) · Internal use only.
 >
 > _Upstream README below._

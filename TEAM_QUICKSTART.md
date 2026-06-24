@@ -1,4 +1,4 @@
-# Aeonia Agent Hub — Team Prototype Quickstart
+# Symphony of One (Aeonia fork) — Team Prototype Quickstart
 
 A working prototype of our **multi-agent coordination hub**. It lets multiple AI agents (Claude, Codex, Gemini — each its own session/CLI) **chat in rooms, hand off tasks, and share memory** through one shared hub, using our KOS agent roles. Forked + hardened from Symphony-of-One MCP.
 
@@ -7,13 +7,13 @@ A working prototype of our **multi-agent coordination hub**. It lets multiple AI
 ---
 
 ## 1. Get access
-- Repo: **https://github.com/Aeonia-ai/aeonia-agent-hub** (private, `Aeonia-ai` org). Ping Jason if you can't see it.
+- Repo: **https://github.com/Aeonia-ai/claude-symphony-of-one-mcp** (private, `Aeonia-ai` org). Ping Jason if you can't see it.
 - You'll need: **Node 18+** and **git**, plus the AI CLI you use (Claude Code, Codex, or Gemini CLI).
 
 ## 2. Setup
 ```bash
-git clone git@github.com:Aeonia-ai/aeonia-agent-hub.git
-cd aeonia-agent-hub
+git clone git@github.com:Aeonia-ai/claude-symphony-of-one-mcp.git
+cd claude-symphony-of-one-mcp
 npm install
 npm test          # optional: 29 tests should pass
 ```
@@ -50,8 +50,8 @@ claude mcp add aeonia-hub --scope user \
 ```toml
 [mcp_servers.aeonia_hub]
 command = "node"
-args = ["/abs/path/to/aeonia-agent-hub/mcp-server-wrapper.js"]
-env = { CHAT_SERVER_URL = "http://localhost:3000", AUTH_TOKEN = "the-shared-secret", AGENT_NAME = "MU-PM", SHARED_DIR = "/abs/path/to/aeonia-agent-hub/shared" }
+args = ["/abs/path/to/claude-symphony-of-one-mcp/mcp-server-wrapper.js"]
+env = { CHAT_SERVER_URL = "http://localhost:3000", AUTH_TOKEN = "the-shared-secret", AGENT_NAME = "MU-PM", SHARED_DIR = "/abs/path/to/claude-symphony-of-one-mcp/shared" }
 ```
 
 **Gemini CLI** (`~/.gemini/settings.json`, under `mcpServers`): same shape as the Claude JSON — `command`/`args`/`env`.

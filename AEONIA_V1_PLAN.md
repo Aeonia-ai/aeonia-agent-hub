@@ -1,6 +1,6 @@
 # Aeonia Symphony — Build Plan
 
-**Repo:** `Aeonia-ai/aeonia-agent-hub` (fork of `ai-wes/claude-symphony-of-one-mcp`; local dir still `claude-symphony-of-one-mcp` to preserve MCP config paths)
+**Repo:** `Aeonia-ai/claude-symphony-of-one-mcp` (fork of `ai-wes/claude-symphony-of-one-mcp`; local dir `claude-symphony-of-one-mcp`)
 **Status:** planning
 **Author:** Jason + Companion (Claude)
 **Last updated:** 2026-06-23
@@ -135,7 +135,7 @@ Transport             = Socket.IO hub  (v1, today)  →  Matrix  (v2, later)
 ---
 
 ## 6. Resolved decisions (2026-06-23)
-1. **Repo name:** renamed to **`aeonia-agent-hub`** (local dir kept as `claude-symphony-of-one-mcp` so MCP config paths don't break).
+1. **Repo name:** `claude-symphony-of-one-mcp` (local dir matches; no redirect needed).
 2. **Room topology:** **one `#org` room (all agents, broadcasts) + a `#<domain>` room per PM**; Coordinator↔PM mostly via tasks; Steward/Scribe in `#org`.
 3. **Hub host:** **Weymouth (control plane), exposed over Tailscale only.** (Localhost acceptable for the very first smoke test, then move to Weymouth.)
 4. **Role prompts boot from KOS threads** — yes (unifies the two systems: KOS = identity, Symphony = live coordination).
@@ -146,7 +146,7 @@ Transport             = Socket.IO hub  (v1, today)  →  Matrix  (v2, later)
 
 ## 8. Progress (2026-06-23/24)
 
-TDD build + local deploy complete. Branch `aeonia/v1` on `Aeonia-ai/aeonia-agent-hub`.
+TDD build + local deploy complete. Branch `aeonia/v1` on `Aeonia-ai/claude-symphony-of-one-mcp`.
 
 | Phase | Status |
 |---|---|
@@ -176,7 +176,7 @@ Agents (the MCP server) connect with env: `CHAT_SERVER_URL=http://<host>:<port>`
 
 **Weymouth / Tailscale (production target — operator step):**
 1. `ssh weymouth` (100.83.164.49, Tailscale).
-2. `git clone git@github.com:Aeonia-ai/aeonia-agent-hub.git && cd aeonia-agent-hub && git checkout aeonia/v1 && npm install`.
+2. `git clone git@github.com:Aeonia-ai/claude-symphony-of-one-mcp.git && cd claude-symphony-of-one-mcp && git checkout aeonia/v1 && npm install`.
 3. Run the hub bound to the Tailscale interface with a real `AUTH_TOKEN` (systemd/pm2 for persistence).
 4. Each machine's agents set `CHAT_SERVER_URL=http://weymouth:<port>` (Tailscale) + the shared `AUTH_TOKEN`.
 > Note: deploying a service onto the control plane is consequential — confirm before running on Weymouth. Upstream has no license (internal use only for now).
