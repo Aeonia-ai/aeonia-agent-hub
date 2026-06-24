@@ -144,5 +144,42 @@ Transport             = Socket.IO hub  (v1, today)  →  Matrix  (v2, later)
 
 ---
 
+## 8. Progress (2026-06-23/24)
+
+TDD build + local deploy complete. Branch `aeonia/v1` on `Aeonia-ai/aeonia-agent-hub`.
+
+| Phase | Status |
+|---|---|
+| 0 — hygiene / branch / gitignore | ✅ done (`a263340`) |
+| 1 — 5 bug fixes (incl. task persistence) | ✅ done, TDD (`3e4eb18`) — 10 tests |
+| 3 — roles re-skin (boot-from-KOS-thread) + dynamic categories | ✅ done, TDD (`72861f0`) — 8 tests |
+| 4 — shared-token auth (REST + Socket.IO) | ✅ done, TDD (`8d2e7b2`) — 7 tests |
+| **deploy (local)** | ✅ hub runs on :3030, auth enforced (401/200/401), live round-trip verified (join → send → read → task, all 200) |
+| 2 — transport adapter (Matrix seam) | ⏳ next (build) |
+| 5 — Weymouth/Tailscale deploy | ⏳ documented below; needs operator go (remote control-plane) |
+| 6 — full 2-agent loop (two live Claude sessions) | ⏳ needs Jason to open two sessions |
+| 8 — Matrix v2 | later |
+
+**Test suite:** 25/25 green (`node --test`).
+
+## 9. Deploy / Run
+
+**Local (verified):**
+```bash
+PORT=3030 \
+AUTH_TOKEN=<secret> \
+DB_PATH=/abs/path/data/hub.db \
+SHARED_DIR=/abs/path/shared \
+node server.js     # run FROM the repo dir (winston logs are written to ./data)
+```
+Agents (the MCP server) connect with env: `CHAT_SERVER_URL=http://<host>:<port>` + `AUTH_TOKEN=<secret>`.
+
+**Weymouth / Tailscale (production target — operator step):**
+1. `ssh weymouth` (100.83.164.49, Tailscale).
+2. `git clone git@github.com:Aeonia-ai/aeonia-agent-hub.git && cd aeonia-agent-hub && git checkout aeonia/v1 && npm install`.
+3. Run the hub bound to the Tailscale interface with a real `AUTH_TOKEN` (systemd/pm2 for persistence).
+4. Each machine's agents set `CHAT_SERVER_URL=http://weymouth:<port>` (Tailscale) + the shared `AUTH_TOKEN`.
+> Note: deploying a service onto the control plane is consequential — confirm before running on Weymouth. Upstream has no license (internal use only for now).
+
 ## 7. Definition of done (v1 / M1)
 Two agents (Coordinator + MU-PM), each booting its identity from its KOS thread, running in separate chat sessions on (at least one) machine, coordinate over the Aeonia Symphony fork: exchange messages, hand off a task that persists across a hub restart, share memory, all behind an auth token and a transport adapter that a Matrix implementation can later drop into — with the 12 MCP tools unchanged.
