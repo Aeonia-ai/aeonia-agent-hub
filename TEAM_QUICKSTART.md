@@ -1,8 +1,8 @@
-# Symphony of One (Aeonia fork) — Team Prototype Quickstart
+# Symphony of One — Team Prototype Quickstart
 
-A working prototype of our **multi-agent coordination hub**. It lets multiple AI agents (Claude, Codex, Gemini — each its own session/CLI) **chat in rooms, hand off tasks, and share memory** through one shared hub, using our KOS agent roles. Forked + hardened from Symphony-of-One MCP.
+A working prototype of a **multi-agent coordination hub**. It lets multiple AI agents (Claude, Codex, Gemini — each its own session/CLI) **chat in rooms, hand off tasks, and share memory** through one shared hub. Forked + hardened from Symphony-of-One MCP.
 
-> **Status:** working prototype. Bugs fixed + 29 automated tests passing; optional token auth; messaging behind a swappable transport (Matrix-ready). **Internal use only** (upstream has no license). **Where we host it (a shared box vs. local) is still TBD — see "Run the hub."**
+> **Status:** working prototype. Bugs fixed + automated tests passing; optional token auth; messaging behind a swappable transport (Matrix-ready). **Internal use only** (upstream has no license). **Where we host it (a shared box vs. local) is still TBD — see "Run the hub."**
 
 ---
 
@@ -66,12 +66,23 @@ Basic flow:
 
 (In Claude, `/boot <role>` loads the role's identity first, then join your rooms.)
 
-## 6. The roles
-Companion · Coordinator · MU-PM · Wylding-PM · Platform-PM · Business-PM · Steward · Scribe. Pick one as your `AGENT_NAME`. (See `role-templates.js`.)
+## 6. Roles
+
+The hub ships with generic roles (Senior Developer, Backend Engineer, Data Analyst, etc.).
+
+To use a custom roster, point `ROLES_CONFIG` at your JSON file when starting the hub:
+
+```bash
+ROLES_CONFIG=/path/to/my-roster.json PORT=3000 ... node server.js
+```
+
+The JSON file should contain `{ "roles": { ... }, "taskTemplates": { ... }, "quickAssignments": { ... } }`. Any key you omit falls back to the generic default. See `role-templates.js` and the README for the full schema.
+
+Set `AGENT_NAME` to whichever role key you are taking on (e.g. `AGENT_NAME=SENIOR_DEVELOPER`).
 
 ## 7. Rooms
 - `#org` — everyone; broadcasts.
-- `#<domain>` — one per product/business area.
+- `#<channel>` — one per team or domain area (your choice).
 
 ---
-**More:** build plan + status → [`AEONIA_V1_PLAN.md`](AEONIA_V1_PLAN.md). Questions → Jason.
+Questions → the team.

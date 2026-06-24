@@ -4,31 +4,54 @@ import {
   AGENT_ROLES,
   TASK_TEMPLATES,
   QUICK_ASSIGNMENTS,
+  DEFAULT_ROLES,
+  DEFAULT_TASK_TEMPLATES,
+  DEFAULT_QUICK_ASSIGNMENTS,
   getRole,
   getRoleNames,
   getRolesByCategory,
+  getCategories,
   getTaskTemplate,
   formatTaskFromTemplate,
   getQuickAssignment,
 } from "../role-templates.js";
 
-const EXPECTED = [
-  "COMPANION",
-  "COORDINATOR",
-  "MU_PM",
-  "WYLDING_PM",
-  "PLATFORM_PM",
-  "BUSINESS_PM",
-  "STEWARD",
-  "SCRIBE",
+// When ROLES_CONFIG is unset (as it is in a plain `node --test` run),
+// AGENT_ROLES should be the generic upstream defaults.
+const GENERIC_ROLES = [
+  "SENIOR_DEVELOPER",
+  "FRONTEND_SPECIALIST",
+  "BACKEND_ENGINEER",
+  "DATA_ANALYST",
+  "SECURITY_ANALYST",
+  "PROJECT_MANAGER",
+  "SCRUM_MASTER",
+  "QA_ENGINEER",
+  "DEVOPS_ENGINEER",
+  "TECHNICAL_WRITER",
+  "RESEARCH_ANALYST",
 ];
 
-test("the 8 Aeonia roles exist (and only those)", () => {
-  assert.deepEqual(getRoleNames().sort(), [...EXPECTED].sort());
+test("generic defaults: SENIOR_DEVELOPER exists and is well-formed", () => {
+  const r = getRole("SENIOR_DEVELOPER");
+  assert.ok(r, "SENIOR_DEVELOPER missing");
+  for (const field of ["name", "category", "description", "prompt", "capabilities", "defaultTasks", "priority"]) {
+    assert.ok(r[field] !== undefined, `SENIOR_DEVELOPER.${field} missing`);
+  }
+  assert.ok(Array.isArray(r.capabilities) && r.capabilities.length > 0);
+  assert.ok(Array.isArray(r.defaultTasks) && r.defaultTasks.length > 0);
 });
 
-test("every role is well-formed", () => {
-  for (const key of EXPECTED) {
+test("generic defaults: exactly the 11 upstream roles are present (no Aeonia roles)", () => {
+  assert.deepEqual(getRoleNames().sort(), [...GENERIC_ROLES].sort());
+  // Aeonia-specific roles must NOT be present in the generic defaults
+  for (const aeonaRole of ["COMPANION", "COORDINATOR", "MU_PM", "SCRIBE"]) {
+    assert.equal(getRole(aeonaRole), undefined, `${aeonaRole} should not be in generic defaults`);
+  }
+});
+
+test("every generic role is well-formed", () => {
+  for (const key of GENERIC_ROLES) {
     const r = getRole(key);
     assert.ok(r, `${key} missing`);
     for (const field of ["name", "category", "description", "prompt", "capabilities", "defaultTasks", "priority"]) {
@@ -39,27 +62,24 @@ test("every role is well-formed", () => {
   }
 });
 
-test("each role prompt boots from its KOS thread", () => {
-  const path = {
-    COMPANION: "role/companion",
-    COORDINATOR: "role/coordinator",
-    MU_PM: "domains/mu/mu-pm",
-    WYLDING_PM: "domains/wylding/wylding-pm",
-    PLATFORM_PM: "domains/platform/platform-pm",
-    BUSINESS_PM: "domains/business/business-pm",
-    STEWARD: "role/steward",
-    SCRIBE: "role/scribe",
-  };
-  for (const [key, frag] of Object.entries(path)) {
-    assert.ok(getRole(key).prompt.includes(frag), `${key} prompt should reference ${frag}`);
-  }
+test("DEFAULT_ROLES matches AGENT_ROLES when no config is set", () => {
+  assert.deepEqual(Object.keys(AGENT_ROLES).sort(), Object.keys(DEFAULT_ROLES).sort());
 });
 
-test("categories cover the org shape", () => {
-  assert.equal(Object.keys(getRolesByCategory("Executive")).length, 1);
-  assert.equal(Object.keys(getRolesByCategory("Coordination")).length, 1);
-  assert.equal(Object.keys(getRolesByCategory("Domain PM")).length, 4);
-  assert.equal(Object.keys(getRolesByCategory("Function Agent")).length, 2);
+test("getRolesByCategory returns correct subset", () => {
+  const dev = getRolesByCategory("Development");
+  assert.ok(Object.keys(dev).includes("SENIOR_DEVELOPER"));
+  assert.ok(Object.keys(dev).includes("FRONTEND_SPECIALIST"));
+  assert.ok(Object.keys(dev).includes("BACKEND_ENGINEER"));
+});
+
+test("getCategories returns all unique categories", () => {
+  const cats = getCategories();
+  assert.ok(Array.isArray(cats));
+  assert.ok(cats.includes("Development"));
+  assert.ok(cats.includes("Analysis"));
+  assert.ok(cats.includes("Management"));
+  assert.equal(cats.length, new Set(cats).size);
 });
 
 test("no task template references a non-existent role (dangling-ref guard)", () => {
@@ -80,11 +100,24 @@ test("no quick assignment references a non-existent role or template", () => {
 });
 
 test("formatTaskFromTemplate substitutes variables", () => {
-  const t = formatTaskFromTemplate("DOMAIN_DIGEST", { domain: "Mission Unpossible" });
-  assert.ok(t.title.includes("Mission Unpossible"));
-  assert.ok(!t.title.includes("{domain}"));
+  const t = formatTaskFromTemplate("BUG_FIX", { bug_description: "login crash" });
+  assert.ok(t.title.includes("login crash"));
+  assert.ok(!t.title.includes("{bug_description}"));
 });
 
-test("getQuickAssignment resolves", () => {
-  assert.ok(getQuickAssignment("CROSS_DOMAIN_PRIORITY"));
+test("formatTaskFromTemplate returns null for unknown template", () => {
+  assert.equal(formatTaskFromTemplate("NONEXISTENT"), null);
+});
+
+test("getQuickAssignment resolves EMERGENCY_BUG_FIX", () => {
+  const q = getQuickAssignment("EMERGENCY_BUG_FIX");
+  assert.ok(q);
+  assert.equal(q.priority, "critical");
+});
+
+test("DEFAULT_TASK_TEMPLATES and DEFAULT_QUICK_ASSIGNMENTS are exported", () => {
+  assert.ok(typeof DEFAULT_TASK_TEMPLATES === "object");
+  assert.ok(typeof DEFAULT_QUICK_ASSIGNMENTS === "object");
+  assert.ok(Object.keys(DEFAULT_TASK_TEMPLATES).length > 0);
+  assert.ok(Object.keys(DEFAULT_QUICK_ASSIGNMENTS).length > 0);
 });
