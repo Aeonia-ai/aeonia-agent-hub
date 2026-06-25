@@ -12,6 +12,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SERVER_URL = process.env.CHAT_SERVER_URL || "http://localhost:3000";
 const SHARED_DIR = process.env.SHARED_DIR || path.join(process.cwd(), "shared");
 const HUB_AUTH_TOKEN = process.env.AUTH_TOKEN || '';
+// Set SYMPHONY_USE_MESSAGE_CACHE=true to use the local Socket.IO buffer for
+// get_messages instead of always fetching from the server. Faster for
+// single-agent local use; incorrect for multi-agent cross-machine coordination.
+const USE_MESSAGE_CACHE = process.env.SYMPHONY_USE_MESSAGE_CACHE === 'true';
 
 // Global state
 let currentAgentId = null;
@@ -281,8 +285,22 @@ server.registerTool(
     }
 
     try {
-      // Always fetch from server — cache fast-path removed to ensure agents
-      // across machines always see authoritative state, not a partial local buffer.
+      // Default: always fetch from server for authoritative state across agents.
+      // Set SYMPHONY_USE_MESSAGE_CACHE=true for single-agent local use where
+      // speed matters more than cross-machine correctness.
+      if (USE_MESSAGE_CACHE && !params.since && messageHistory.length > 0) {
+        const limit = params.limit || 50;
+        const messages = messageHistory.slice(-limit);
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Retrieved ${messages.length} messages from local cache:\n\n${messages.map(m => `[${new Date(m.timestamp).toLocaleTimeString()}] ${m.agentName}: ${m.content}`).join('\n')}`
+            }
+          ]
+        };
+      }
+
       const response = await transport.getMessages(currentRoom, params.since, params.limit || 50);
 
       const messages = response.data.messages;
