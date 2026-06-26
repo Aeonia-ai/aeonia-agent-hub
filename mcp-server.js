@@ -353,15 +353,18 @@ server.registerTool(
     // The local array only contains events received since this session's room_join;
     // server fetch catches @mentions sent before this agent was online.
     let serverNotifs = [];
-    try {
-      const response = await transport.getNotifications(currentAgentId, agentName, params.unreadOnly);
-      serverNotifs = (response.data?.notifications || []).map(n => ({
-        ...n,
-        read: !!n.is_read,
-        timestamp: n.created_at,
-      }));
-    } catch (_) {
-      // fall through to local-only
+    if (transport) {
+      try {
+        const response = await transport.getNotifications(currentAgentId, agentName, params.unreadOnly);
+        console.error('[get_notifications] server response:', JSON.stringify(response.data));
+        serverNotifs = (response.data?.notifications || []).map(n => ({
+          ...n,
+          read: !!n.is_read,
+          timestamp: n.created_at,
+        }));
+      } catch (err) {
+        console.error('[get_notifications] server fetch failed:', err.message);
+      }
     }
     // Merge: server results take precedence; deduplicate by id.
     const seen = new Set(serverNotifs.map(n => n.id));
